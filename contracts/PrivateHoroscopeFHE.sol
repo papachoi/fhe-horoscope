@@ -21,22 +21,27 @@ contract PrivateHoroscopeFHE {
         externalEuint64 extDob, bytes calldata attDob,
         externalEuint64 extColor, bytes calldata attColor
     ) external {
+        // Convert external ciphertexts into internal encrypted values
         euint64 dob   = FHE.fromExternal(extDob, attDob);
         euint64 color = FHE.fromExternal(extColor, attColor);
 
-        euint64 sum   = FHE.add(dob, color);
+        // Compute result: (dob + color) mod 100 + 1
+        euint64 sum     = FHE.add(dob, color);
         euint64 hundred = FHE.asEuint64(100);
         euint64 mod100  = FHE.rem(sum, hundred);
         euint64 one     = FHE.asEuint64(1);
         euint64 out     = FHE.add(mod100, one);
 
+        // Prepare for decryption request
         bytes32 ;
         hs[0] = FHE.toBytes32(out);
+
         uint256 reqId = oracle.requestDecryption(hs, address(this), this.onDecrypted.selector);
         emit Predicted(reqId);
     }
 
     function onDecrypted(uint256 /*reqId*/, uint64 value, bytes[] calldata signatures) external {
+        // Verify oracle signatures
         FHE.checkSignatures(0, signatures);
         emit Revealed(value, signatures.length > 0 ? signatures[0] : "");
     }
