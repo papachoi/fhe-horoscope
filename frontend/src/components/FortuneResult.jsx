@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 /**
  * Simple card-style component to display the user's fortune.
@@ -7,6 +7,18 @@ import React from "react";
  *   - message: fortune text from getHoroscopeMessage()
  */
 export default function FortuneResult({ number, message }) {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (number) {
+      // trigger fade-in a bit after mount
+      const timer = setTimeout(() => setVisible(true), 50);
+      return () => clearTimeout(timer);
+    } else {
+      setVisible(false);
+    }
+  }, [number]);
+
   if (!number) return null;
 
   return (
@@ -20,7 +32,10 @@ export default function FortuneResult({ number, message }) {
         border: "1px solid #ddd",
         boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
         textAlign: "center",
-        fontFamily: "Inter, system-ui"
+        fontFamily: "Inter, system-ui",
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(10px)",
+        transition: "opacity 0.6s ease, transform 0.6s ease"
       }}
     >
       <h2>Your Fortune</h2>
