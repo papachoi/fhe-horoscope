@@ -96,3 +96,18 @@ function App() {
 }
 
 export default App;
+
+import FortuneLegend from "./components/FortuneLegend";
+
+...
+
+	{prediction && (
+		  <>
+		    <FortuneResult
+		      number={prediction}
+		      message={await getHoroscopeMessage(prediction)}
+		    />
+		    <FortuneLegend />
+		  </>
+	)}
+
